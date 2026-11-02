@@ -106,6 +106,9 @@ async function api(path, opts={}){
     if(r.status===401||r.status===403){ if(path.indexOf('/auth/')===-1){ saveAuth(null); route('auth'); } const e = await r.json().catch(()=>({message:'Unauthorized'})); throw new Error(e.message||'Unauthorized'); }
     if(r.status===204) return null;
     const data = await r.json().catch(()=>null);
+    if(r.status===404 && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1'){
+      throw new Error('Backend API not found on this domain. The Java Spring Boot backend is running locally at http://localhost:8080.');
+    }
     if(!r.ok) throw new Error(data?.message||`Request failed (${r.status})`);
     return data;
   }catch(e){ if(e.message==='Failed to fetch') throw new Error('Cannot connect to server. Is the backend running?'); throw e; }
@@ -167,6 +170,16 @@ function renderAuth(container){
   container.appendChild(wrap);
   function draw(){
     wrap.innerHTML='';
+    if(location.hostname !== 'localhost' && location.hostname !== '127.0.0.1'){
+      wrap.appendChild(h('div',{className:'alert alert-warning',style:'margin-bottom:16px;font-size:.82rem;line-height:1.4'},
+        h('strong',{},'☁️ Running on Cloud Frontend (Vercel): '),
+        'The Java Spring Boot API & PostgreSQL database run locally on your machine at ',
+        h('a',{href:'http://localhost:8080',target:'_blank',style:'font-weight:700;color:var(--navy);text-decoration:underline'},'http://localhost:8080'),
+        '. To test full registration & database features locally, please open ',
+        h('strong',{},'http://localhost:8080'),
+        ' in your browser.'
+      ));
+    }
     wrap.appendChild(h('div',{style:'text-align:center;margin-bottom:32px'},
       h('h1',{style:'font-size:2rem;font-weight:800;color:var(--navy)'},'SchemeSathi'),
       h('p',{style:'color:var(--text2);margin-top:4px'},'Government Scheme Discovery Platform')
