@@ -307,34 +307,115 @@ async function renderProfile(container){
 
 /* ===== SCHEMES ===== */
 async function renderSchemes(container){
-  container.appendChild(h('div',{className:'page-header'},h('h1',{},'Government Schemes'),h('p',{},'Browse verified Central and State government schemes.')));
-  const stateSelect = h('select',{id:'fstate',on:{change:load}},h('option',{value:''},'All States / Central'),...Object.entries(STATES).map(([k,v])=>h('option',{value:k},v)));
-  const catInput = h('input',{id:'fcat',type:'text',placeholder:'Filter by category...',on:{input:load}});
+  container.appendChild(h('div',{className:'page-header'},
+    h('h1',{},'Government Schemes Directory'),
+    h('p',{},'Browse verified Central and State government schemes with deterministic eligibility rules.')
+  ));
+  const stateSelect = h('select',{id:'fstate',on:{change:load}},
+    h('option',{value:''},'All States / Central'),
+    ...Object.entries(STATES).map(([k,v])=>h('option',{value:k},v))
+  );
+  const catInput = h('input',{id:'fcat',type:'text',placeholder:'Filter by category or keyword...',on:{input:load}});
   container.appendChild(h('div',{className:'filter-bar'},stateSelect,catInput));
-  const listDiv = h('div',{id:'scheme-list',className:'grid grid-2'});
-  container.appendChild(listDiv);
+  
+  const contentDiv = h('div',{id:'scheme-content'});
+  container.appendChild(contentDiv);
+
+  function createSchemeCard(s){
+    const verified = s.verifiedAt ? h('span',{className:'badge badge-green'},'✓ Verified Source') : h('span',{className:'badge badge-yellow'},'Unverified');
+    const scope = s.scope==='CENTRAL'
+      ? h('span',{className:'badge badge-blue'},'Central Govt')
+      : h('span',{className:'badge badge-saffron'},(STATES[s.stateCode]||s.stateCode)+' State');
+    return h('div',{className:'card scheme-list-item',on:{click:()=>route('scheme/'+s.id)}},
+      h('div',{style:'display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;align-items:center'},scope,h('span',{className:'tag'},s.category),verified),
+      h('h3',{style:'font-weight:700;font-size:1rem;margin-bottom:6px;color:var(--navy)'},s.title),
+      h('p',{style:'font-size:.85rem;color:var(--text2);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:10px'},s.summary),
+      h('div',{style:'display:flex;justify-content:space-between;align-items:center;font-size:.78rem;color:var(--text2);border-top:1px solid #f0f0f0;padding-top:8px'},
+        h('span',{},'Source: '+(s.sourceName||'Official Portal')),
+        h('span',{style:'color:var(--navy);font-weight:600'},'View Details →')
+      )
+    );
+  }
+
   async function load(){
-    listDiv.innerHTML=''; listDiv.appendChild(h('div',{className:'loading-full'},h('div',{className:'spinner'}),h('span',{},'Loading schemes...')));
+    contentDiv.innerHTML='';
+    contentDiv.appendChild(h('div',{className:'loading-full'},h('div',{className:'spinner'}),h('span',{},'Loading verified schemes...')));
     try{
       let url='/api/v1/schemes';
       const params=[];
-      if(stateSelect.value) params.push('state='+stateSelect.value);
+      if(stateSelect.value) params.push('state='+encodeURIComponent(stateSelect.value));
       if(catInput.value.trim()) params.push('category='+encodeURIComponent(catInput.value.trim()));
       if(params.length) url+='?'+params.join('&');
-      const schemes=await api(url);
-      listDiv.innerHTML='';
-      if(!schemes.length){ listDiv.appendChild(h('div',{className:'empty-state'},h('h3',{},'No schemes found'),h('p',{},'Try adjusting your filters or check back later.'))); return; }
-      schemes.forEach(s=>{
-        const verified = s.verifiedAt?h('span',{className:'badge badge-green'},'✓ Verified'):h('span',{className:'badge badge-yellow'},'Unverified');
-        const scope = s.scope==='CENTRAL'?h('span',{className:'badge badge-blue'},'Central'):h('span',{className:'badge badge-saffron'},STATES[s.stateCode]||s.stateCode);
-        const card = h('div',{className:'card scheme-list-item',on:{click:()=>route('scheme/'+s.id)}},
-          h('div',{style:'display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap'},scope,h('span',{className:'tag'},s.category),verified),
-          h('h3',{style:'font-weight:700;font-size:1rem;margin-bottom:6px'},s.title),
-          h('p',{style:'font-size:.85rem;color:var(--text2);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden'},s.summary)
-        );
-        listDiv.appendChild(card);
-      });
-    }catch(e){ listDiv.innerHTML=''; listDiv.appendChild(h('div',{className:'alert alert-error'},e.message)); }
+      
+      const schemes = await api(url);
+      contentDiv.innerHTML='';
+      
+      if(!schemes.length){
+        contentDiv.appendChild(h('div',{className:'empty-state card'},
+          h('h3',{},'No schemes found'),
+          h('p',{},'No schemes matched your search or category filter. Try clearing filters.')
+        ));
+        return;
+      }
+
+      const centralSchemes = schemes.filter(s => s.scope === 'CENTRAL');
+      const stateSchemes = schemes.filter(s => s.scope === 'STATE');
+      const selectedStateCode = stateSelect.value;
+      const selectedStateName = selectedStateCode ? (STATES[selectedStateCode] || selectedStateCode) : null;
+
+      // Section 1: Central Schemes
+      const centralSection = h('div',{style:'margin-bottom:28px'});
+      centralSection.appendChild(h('div',{style:'display:flex;align-items:center;gap:10px;margin-bottom:14px;border-bottom:2px solid var(--border);padding-bottom:8px'},
+        h('h2',{style:'font-size:1.15rem;font-weight:700;color:var(--navy)'},'🏛️ Central Government Schemes'),
+        h('span',{className:'badge badge-blue'},centralSchemes.length+' available across all states')
+      ));
+
+      if(centralSchemes.length > 0){
+        const centralGrid = h('div',{className:'grid grid-2'});
+        centralSchemes.forEach(s => centralGrid.appendChild(createSchemeCard(s)));
+        centralSection.appendChild(centralGrid);
+      } else {
+        centralSection.appendChild(h('div',{className:'alert alert-warning'},'No central schemes match your category/keyword filter.'));
+      }
+      contentDiv.appendChild(centralSection);
+
+      // Section 2: State Schemes
+      const stateSection = h('div',{style:'margin-bottom:28px'});
+      const stateHeaderTitle = selectedStateName 
+        ? `🏢 ${selectedStateName} State Schemes`
+        : '🏢 State Government Schemes (By State)';
+      
+      stateSection.appendChild(h('div',{style:'display:flex;align-items:center;gap:10px;margin-bottom:14px;border-bottom:2px solid var(--border);padding-bottom:8px'},
+        h('h2',{style:'font-size:1.15rem;font-weight:700;color:var(--navy)'},stateHeaderTitle),
+        h('span',{className:'badge badge-saffron'},stateSchemes.length+' state-specific records')
+      ));
+
+      if(stateSchemes.length > 0){
+        const stateGrid = h('div',{className:'grid grid-2'});
+        stateSchemes.forEach(s => stateGrid.appendChild(createSchemeCard(s)));
+        stateSection.appendChild(stateGrid);
+      } else {
+        // Clear empty state when selected state has no verified records yet
+        if(selectedStateName){
+          stateSection.appendChild(h('div',{className:'card',style:'background:#fdfcf8;border-left:4px solid var(--saffron);padding:24px'},
+            h('h3',{style:'font-size:1rem;font-weight:700;color:var(--text);margin-bottom:6px'},'No State-Specific Schemes Verified Yet for '+selectedStateName),
+            h('p',{style:'font-size:.88rem;color:var(--text2);margin-bottom:10px'},
+              'Currently, official state portal ingestion and provenance verification has been completed for Madhya Pradesh. State-specific programs for '+selectedStateName+' are undergoing administrative verification.'
+            ),
+            h('p',{style:'font-size:.85rem;color:var(--navy);font-weight:600'},
+              '✓ All Central Government schemes shown above remain fully applicable to eligible citizens residing in '+selectedStateName+'.'
+            )
+          ));
+        } else {
+          stateSection.appendChild(h('div',{className:'alert alert-info'},'No state-specific schemes match your search filter.'));
+        }
+      }
+      contentDiv.appendChild(stateSection);
+
+    }catch(e){
+      contentDiv.innerHTML='';
+      contentDiv.appendChild(h('div',{className:'alert alert-error'},e.message));
+    }
   }
   load();
 }
