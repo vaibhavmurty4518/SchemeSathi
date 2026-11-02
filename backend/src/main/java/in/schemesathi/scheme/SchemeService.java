@@ -1,0 +1,5 @@
+package in.schemesathi.scheme;
+import org.springframework.stereotype.Service;import java.util.*;
+@Service public class SchemeService{private final SchemeRepository repo;public SchemeService(SchemeRepository repo){this.repo=repo;}
+ public List<SchemeDtos.SchemeResponse> list(String state,String category){String st=state==null?null:state.trim().toUpperCase();String cat=category==null?null:category.trim().toLowerCase();return repo.findAll().stream().filter(GovernmentScheme::isPublished).filter(s->"APPROVED".equals(s.getReviewStatus())).filter(s->"CENTRAL".equals(s.getScope())||(st!=null&&st.equalsIgnoreCase(s.getStateCode()))).filter(s->cat==null||s.getCategory().toLowerCase().contains(cat)).sorted(Comparator.comparing(GovernmentScheme::getTitle)).map(SchemeDtos.SchemeResponse::new).toList();}
+ public SchemeDtos.SchemeResponse detail(UUID id){GovernmentScheme s=repo.findById(id).orElseThrow(()->new IllegalArgumentException("Scheme not found"));if(!s.isPublished()||!"APPROVED".equals(s.getReviewStatus()))throw new IllegalArgumentException("Scheme is not publicly available");return new SchemeDtos.SchemeResponse(s);}}

@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SchemeSathi — Government Scheme Discovery Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--saffron:#FF9933;--green:#138808;--navy:#000080;--bg:#f5f7fa;--card:#fff;--text:#1a1a2e;--text2:#555;--border:#e0e0e0;--danger:#dc3545;--warn:#f0ad4e;--radius:10px;--shadow:0 2px 12px rgba(0,0,0,.08)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+a{color:var(--navy);text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;border-radius:6px;padding:10px 20px;font-size:.9rem;font-weight:600;transition:all .2s}
+input,select,textarea{font-family:inherit;padding:10px 14px;border:1.5px solid var(--border);border-radius:6px;font-size:.9rem;width:100%;transition:border-color .2s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy)}
+label{font-weight:500;font-size:.85rem;color:var(--text2);display:block;margin-bottom:4px}
+.btn-primary{background:var(--navy);color:#fff}.btn-primary:hover{background:#000060}
+.btn-saffron{background:var(--saffron);color:#fff}.btn-saffron:hover{background:#e68a2e}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{background:#0f6e06}
+.btn-danger{background:var(--danger);color:#fff}.btn-danger:hover{background:#b02a37}
+.btn-outline{background:transparent;border:1.5px solid var(--navy);color:var(--navy)}.btn-outline:hover{background:var(--navy);color:#fff}
+.btn-sm{padding:6px 14px;font-size:.8rem}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+nav{background:linear-gradient(135deg,var(--navy) 0%,#1a0080 100%);color:#fff;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+nav .brand{font-size:1.3rem;font-weight:800;display:flex;align-items:center;gap:8px}
+nav .brand span{color:var(--saffron)}
+nav .nav-links{display:flex;gap:6px;align-items:center}
+nav .nav-links a,nav .nav-links button{color:rgba(255,255,255,.85);background:transparent;padding:8px 14px;border-radius:6px;font-size:.85rem;font-weight:500}
+nav .nav-links a:hover,nav .nav-links button:hover{background:rgba(255,255,255,.15);color:#fff}
+nav .nav-links .active{background:rgba(255,255,255,.2);color:#fff}
+nav .user-info{display:flex;align-items:center;gap:12px;font-size:.85rem}
+nav .user-info .avatar{width:32px;height:32px;border-radius:50%;background:var(--saffron);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem}
+.container{max-width:1100px;margin:0 auto;padding:24px}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-bottom:16px}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.card-header h2{font-size:1.2rem;font-weight:700}
+.grid{display:grid;gap:16px}
+.grid-2{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.grid-3{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.grid-4{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-group{margin-bottom:16px}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600}
+.badge-green{background:#d4edda;color:#155724}
+.badge-yellow{background:#fff3cd;color:#856404}
+.badge-red{background:#f8d7da;color:#721c24}
+.badge-blue{background:#d1ecf1;color:#0c5460}
+.badge-gray{background:#e9ecef;color:#495057}
+.badge-saffron{background:#fff0de;color:#8a5000}
+.alert{padding:14px 18px;border-radius:8px;margin-bottom:16px;font-size:.9rem}
+.alert-error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb}
+.alert-success{background:#d4edda;color:#155724;border:1px solid #c3e6cb}
+.alert-info{background:#d1ecf1;color:#0c5460;border:1px solid #bee5eb}
+.alert-warning{background:#fff3cd;color:#856404;border:1px solid #ffeeba}
+.spinner{display:inline-block;width:20px;height:20px;border:3px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-full{display:flex;justify-content:center;align-items:center;padding:60px;flex-direction:column;gap:12px;color:var(--text2)}
+.empty-state{text-align:center;padding:48px 24px;color:var(--text2)}
+.empty-state h3{font-size:1.1rem;margin-bottom:8px;color:var(--text)}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.75rem;font-weight:500;background:#eef;color:var(--navy);margin:2px}
+.stat-card{text-align:center;padding:20px}.stat-card .stat-num{font-size:2rem;font-weight:800;color:var(--navy)}.stat-card .stat-label{font-size:.8rem;color:var(--text2);margin-top:4px}
+.tricolor{height:4px;background:linear-gradient(90deg,var(--saffron) 33%,#fff 33%,#fff 66%,var(--green) 66%)}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:200;padding:24px}
+.modal{background:#fff;border-radius:12px;max-width:600px;width:100%;max-height:80vh;overflow-y:auto;padding:28px;box-shadow:0 8px 40px rgba(0,0,0,.2)}
+.modal h2{margin-bottom:16px}
+.scheme-list-item{cursor:pointer;transition:transform .15s,box-shadow .15s}.scheme-list-item:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,0,0,.12)}
+.eligibility-result .rule{padding:8px 12px;border-radius:6px;margin:4px 0;font-size:.85rem;display:flex;align-items:flex-start;gap:8px}
+.eligibility-result .rule-pass{background:#d4edda}.eligibility-result .rule-fail{background:#f8d7da}.eligibility-result .rule-missing{background:#fff3cd}
+.checklist-item{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px}
+.tracker-status{font-weight:600;font-size:.8rem}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:10px 12px;background:#f8f9fa;font-size:.8rem;color:var(--text2);font-weight:600;border-bottom:2px solid var(--border)}
+td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:.85rem}
+.page-header{margin-bottom:24px}
+.page-header h1{font-size:1.6rem;font-weight:800;color:var(--navy)}
+.page-header p{color:var(--text2);margin-top:4px}
+.filter-bar{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+.filter-bar input,.filter-bar select{max-width:220px}
+@media(max-width:768px){.form-row{grid-template-columns:1fr}.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}.filter-bar{flex-direction:column}.filter-bar input,.filter-bar select{max-width:100%}nav .nav-links{display:none}nav .hamburger{display:block}}
+@media(min-width:769px){nav .hamburger{display:none}}
+.hero{background:linear-gradient(135deg,var(--navy),#1a237e);color:#fff;padding:48px 24px;text-align:center;border-radius:var(--radius);margin-bottom:24px}
+.hero h1{font-size:2rem;font-weight:800;margin-bottom:8px}
+.hero p{opacity:.85;max-width:600px;margin:0 auto}
+</style>
+</head>
+<body>
+<div class="tricolor"></div>
+<div id="app"></div>
+
+<script>
+'use strict';
+const API = location.origin;
+const STATES = {AP:'Andhra Pradesh',AR:'Arunachal Pradesh',AS:'Assam',BR:'Bihar',CG:'Chhattisgarh',GA:'Goa',GJ:'Gujarat',HR:'Haryana',HP:'Himachal Pradesh',JH:'Jharkhand',KA:'Karnataka',KL:'Kerala',MP:'Madhya Pradesh',MH:'Maharashtra',MN:'Manipur',ML:'Meghalaya',MZ:'Mizoram',NL:'Nagaland',OD:'Odisha',PB:'Punjab',RJ:'Rajasthan',SK:'Sikkim',TN:'Tamil Nadu',TS:'Telangana',TR:'Tripura',UP:'Uttar Pradesh',UK:'Uttarakhand',WB:'West Bengal',AN:'Andaman & Nicobar',CH:'Chandigarh',DN:'Dadra & Nagar Haveli',DD:'Daman & Diu',DL:'Delhi',JK:'Jammu & Kashmir',LA:'Ladakh',LD:'Lakshadweep',PY:'Puducherry'};
+
+let auth = null;
+try { const s = sessionStorage.getItem('ss_auth'); if(s) auth = JSON.parse(s); } catch(e){}
+
+function saveAuth(a){ auth = a; if(a) sessionStorage.setItem('ss_auth', JSON.stringify(a)); else sessionStorage.removeItem('ss_auth'); }
+function isAdmin(){ return auth && (auth.role==='ADMIN'||auth.role==='REVIEWER'); }
+function headers(json=true){ const h = {}; if(json) h['Content-Type']='application/json'; if(auth) h['Authorization']='Bearer '+auth.token; return h; }
+
+async function api(path, opts={}){
+  try{
+    const r = await fetch(API+path, {headers:headers(opts.body!==undefined), ...opts, body:opts.body?JSON.stringify(opts.body):undefined});
+    if(r.status===401||r.status===403){ if(path.indexOf('/auth/')===-1){ saveAuth(null); route('auth'); } const e = await r.json().catch(()=>({message:'Unauthorized'})); throw new Error(e.message||'Unauthorized'); }
+    if(r.status===204) return null;
+    const data = await r.json().catch(()=>null);
+    if(!r.ok) throw new Error(data?.message||`Request failed (${r.status})`);
+    return data;
+  }catch(e){ if(e.message==='Failed to fetch') throw new Error('Cannot connect to server. Is the backend running?'); throw e; }
+}
+
+function $(sel,ctx=document){return ctx.querySelector(sel)}
+function $$(sel,ctx=document){return[...ctx.querySelectorAll(sel)]}
+function h(tag,attrs,...kids){const el=document.createElement(tag);if(attrs)Object.entries(attrs).forEach(([k,v])=>{if(k==='on')Object.entries(v).forEach(([e,fn])=>el.addEventListener(e,fn));else if(k==='className')el.className=v;else if(k==='innerHTML')el.innerHTML=v;else el.setAttribute(k,v)});kids.flat().forEach(c=>{if(c==null)return;if(typeof c==='string')el.appendChild(document.createTextNode(c));else el.appendChild(c)});return el}
+
+function route(hash){ if(hash) location.hash = hash; }
+function getRoute(){ const r = location.hash.slice(1)||'auth'; return r; }
+
+function render(){
+  const app = $('#app');
+  app.innerHTML = '';
+  const r = getRoute();
+  if(!auth && r!=='auth'){ route('auth'); return; }
+  if(auth && r==='auth'){ route('dashboard'); return; }
+  if(r==='auth') renderAuth(app);
+  else{
+    app.appendChild(renderNav());
+    const main = h('div',{className:'container'});
+    app.appendChild(main);
+    if(r==='dashboard') renderDashboard(main);
+    else if(r==='profile') renderProfile(main);
+    else if(r==='schemes') renderSchemes(main);
+    else if(r.startsWith('scheme/')) renderSchemeDetail(main, r.split('/')[1]);
+    else if(r==='documents') renderDocuments(main);
+    else if(r==='tracker') renderTracker(main);
+    else if(r==='admin') renderAdmin(main);
+    else renderDashboard(main);
+  }
+}
+window.addEventListener('hashchange', render);
+window.addEventListener('load', render);
+
+function renderNav(){
+  const links = [
+    h('a',{href:'#dashboard',className:getRoute()==='dashboard'?'active':''},'Dashboard'),
+    h('a',{href:'#schemes',className:getRoute()==='schemes'?'active':''},'Schemes'),
+    h('a',{href:'#profile',className:getRoute()==='profile'?'active':''},'Profile'),
+    h('a',{href:'#documents',className:getRoute()==='documents'?'active':''},'Documents'),
+    h('a',{href:'#tracker',className:getRoute()==='tracker'?'active':''},'Tracker'),
+  ];
+  if(isAdmin()) links.push(h('a',{href:'#admin',className:getRoute()==='admin'?'active':''},'Admin'));
+  const initial = auth.fullName?auth.fullName[0].toUpperCase():'U';
+  const logoutBtn = h('button',{className:'btn-sm',on:{click:()=>{saveAuth(null);route('auth');render();}}},'Logout');
+  return h('nav',{},
+    h('div',{className:'brand'},h('span',{},'Scheme'),h('span',{},'\u200BSathi')),
+    h('div',{className:'nav-links'},...links),
+    h('div',{className:'user-info'},h('div',{className:'avatar'},initial),h('span',{},auth.fullName),logoutBtn)
+  );
+}
+
+/* ===== AUTH ===== */
+function renderAuth(container){
+  let mode='login';
+  const wrap = h('div',{style:'max-width:420px;margin:60px auto;padding:0 16px'});
+  container.appendChild(wrap);
+  function draw(){
+    wrap.innerHTML='';
+    wrap.appendChild(h('div',{style:'text-align:center;margin-bottom:32px'},
+      h('h1',{style:'font-size:2rem;font-weight:800;color:var(--navy)'},'SchemeSathi'),
+      h('p',{style:'color:var(--text2);margin-top:4px'},'Government Scheme Discovery Platform')
+    ));
+    const card = h('div',{className:'card'});
+    const title = h('h2',{style:'margin-bottom:20px;font-size:1.2rem'},mode==='login'?'Sign In':'Create Account');
+    const err = h('div',{id:'auth-error'});
+    const form = h('form',{on:{submit:async e=>{
+      e.preventDefault();
+      const btn = $('button[type=submit]',form); btn.disabled=true; btn.textContent='Please wait...'; err.innerHTML='';
+      try{
+        const d = mode==='login'
+          ? await api('/api/v1/auth/login',{method:'POST',body:{email:$('#ae',form).value,password:$('#ap',form).value}})
+          : await api('/api/v1/auth/register',{method:'POST',body:{fullName:$('#afn',form).value,email:$('#ae',form).value,password:$('#ap',form).value}});
+        saveAuth(d); route('dashboard'); render();
+      }catch(ex){ err.innerHTML=''; err.appendChild(h('div',{className:'alert alert-error'},ex.message)); btn.disabled=false; btn.textContent=mode==='login'?'Sign In':'Create Account'; }
+    }}});
+    if(mode==='register') form.appendChild(h('div',{className:'form-group'},h('label',{for:'afn'},'Full Name'),h('input',{id:'afn',type:'text',required:'',minlength:'2',maxlength:'80',placeholder:'Your full name'})));
+    form.appendChild(h('div',{className:'form-group'},h('label',{for:'ae'},'Email'),h('input',{id:'ae',type:'email',required:'',placeholder:'you@example.com'})));
+    form.appendChild(h('div',{className:'form-group'},h('label',{for:'ap'},'Password'),h('input',{id:'ap',type:'password',required:'',minlength:mode==='register'?'10':'1',placeholder:mode==='register'?'Min 10 characters':'Your password'})));
+    form.appendChild(err);
+    form.appendChild(h('button',{type:'submit',className:'btn-primary',style:'width:100%;margin-top:8px'},mode==='login'?'Sign In':'Create Account'));
+    card.appendChild(title); card.appendChild(form);
+    const toggle = h('p',{style:'text-align:center;margin-top:16px;font-size:.85rem;color:var(--text2)'},
+      mode==='login'?'Don\'t have an account? ':'Already have an account? ',
+      h('a',{href:'#',style:'color:var(--navy);font-weight:600',on:{click:e=>{e.preventDefault();mode=mode==='login'?'register':'login';draw();}}},(mode==='login'?'Register':'Sign In'))
+    );
+    wrap.appendChild(card); wrap.appendChild(toggle);
+  }
+  draw();
+}
+
+/* ===== DASHBOARD ===== */
+async function renderDashboard(container){
+  container.appendChild(h('div',{className:'hero'},
+    h('h1',{},`Welcome, ${auth.fullName}!`),
+    h('p',{},'Discover government schemes you may be eligible for, track your applications, and manage your documents.')
+  ));
+  const grid = h('div',{className:'grid grid-4'});
+  container.appendChild(grid);
+  const cards = [
+    {icon:'📋',label:'My Profile',desc:'Complete your profile for eligibility matching',link:'#profile'},
+    {icon:'🏛️',label:'Browse Schemes',desc:'Explore Central & State government schemes',link:'#schemes'},
+    {icon:'📄',label:'Documents',desc:'Track your document readiness',link:'#documents'},
+    {icon:'📊',label:'Tracker',desc:'Track your scheme applications',link:'#tracker'},
+  ];
+  if(isAdmin()) cards.push({icon:'⚙️',label:'Admin Panel',desc:'Review & approve scheme entries',link:'#admin'});
+  cards.forEach(c=>grid.appendChild(h('a',{href:c.link,className:'card scheme-list-item',style:'text-decoration:none;color:inherit'},
+    h('div',{style:'font-size:2rem;margin-bottom:8px'},c.icon),
+    h('h3',{style:'font-weight:700;margin-bottom:4px'},c.label),
+    h('p',{style:'font-size:.85rem;color:var(--text2)'},c.desc)
+  )));
+
+  // Load stats
+  try{
+    const [schemes, apps, docs] = await Promise.all([
+      api('/api/v1/schemes').catch(()=>[]),
+      api('/api/v1/my-applications').catch(()=>[]),
+      api('/api/v1/documents/my-checklist').catch(()=>[])
+    ]);
+    const statsGrid = h('div',{className:'grid grid-3',style:'margin-top:24px'});
+    statsGrid.appendChild(h('div',{className:'card stat-card'},h('div',{className:'stat-num'},String(schemes.length)),h('div',{className:'stat-label'},'Available Schemes')));
+    statsGrid.appendChild(h('div',{className:'card stat-card'},h('div',{className:'stat-num'},String(apps.length)),h('div',{className:'stat-label'},'Tracked Applications')));
+    statsGrid.appendChild(h('div',{className:'card stat-card'},h('div',{className:'stat-num'},String(docs.filter(d=>d.status==='READY').length)+'/'+String(docs.length)),h('div',{className:'stat-label'},'Documents Ready')));
+    container.appendChild(statsGrid);
+  }catch(e){}
+}
+
+/* ===== PROFILE ===== */
+async function renderProfile(container){
+  container.appendChild(h('div',{className:'page-header'},h('h1',{},'Citizen Profile'),h('p',{},'Complete your profile to get accurate scheme eligibility matching.')));
+  const loadDiv = h('div',{className:'loading-full'},h('div',{className:'spinner'}),h('span',{},'Loading profile...'));
+  container.appendChild(loadDiv);
+  let profile = {};
+  try{ profile = await api('/api/v1/profile'); }catch(e){ if(!e.message.includes('not found')){ loadDiv.innerHTML=''; loadDiv.appendChild(h('div',{className:'alert alert-warning'},'Profile not yet created. Fill in your details below.')); } }
+  loadDiv.remove();
+  const card = h('div',{className:'card'});
+  container.appendChild(card);
+  const err = h('div',{id:'profile-msg'});
+  const stateOpts = [h('option',{value:''},'Select State'),...Object.entries(STATES).map(([k,v])=>h('option',{value:k,...(profile?.stateCode===k?{selected:''}:{})},v))];
+  function sel(id,label,opts,val){
+    const s = h('select',{id},...opts);
+    if(val) s.value=val;
+    return h('div',{className:'form-group'},h('label',{for:id},label),s);
+  }
+  function inp(id,label,type,val,attrs={}){
+    const i = h('input',{id,type,...attrs});
+    if(val!=null) i.value=val;
+    return h('div',{className:'form-group'},h('label',{for:id},label),i);
+  }
+  const form = h('form',{on:{submit:async e=>{
+    e.preventDefault(); err.innerHTML='';
+    const btn = $('button[type=submit]',form); btn.disabled=true; btn.textContent='Saving...';
+    const body = {
+      dateOfBirth:$('#pdob',form).value||null,
+      stateCode:$('#pstate',form).value||null,
+      district:$('#pdistrict',form).value||null,
+      gender:$('#pgender',form).value||null,
+      maritalStatus:$('#pmarital',form).value||null,
+      annualIncome:$('#pincome',form).value?parseInt($('#pincome',form).value):null,
+      employmentStatus:$('#pemploy',form).value||null,
+      educationLevel:$('#pedu',form).value||null,
+      socialCategory:$('#pcategory',form).value||null,
+      residenceType:$('#presidency',form).value||null,
+      disability:$('#pdisability',form).value==='true'?true:$('#pdisability',form).value==='false'?false:null,
+      interests:[]
+    };
+    try{ await api('/api/v1/profile',{method:'PUT',body}); err.appendChild(h('div',{className:'alert alert-success'},'Profile saved successfully!')); }
+    catch(ex){ err.appendChild(h('div',{className:'alert alert-error'},ex.message)); }
+    btn.disabled=false; btn.textContent='Save Profile';
+  }}},
+    h('div',{className:'form-row'},
+      inp('pdob','Date of Birth','date',profile?.dateOfBirth),
+      sel('pgender','Gender',[h('option',{value:''},'Select'),h('option',{value:'MALE'},'Male'),h('option',{value:'FEMALE'},'Female'),h('option',{value:'OTHER'},'Other')],profile?.gender)
+    ),
+    h('div',{className:'form-row'},
+      h('div',{className:'form-group'},h('label',{for:'pstate'},'State'),h('select',{id:'pstate'},...stateOpts)),
+      inp('pdistrict','District','text',profile?.district,{maxlength:'100',placeholder:'e.g. Bhopal'})
+    ),
+    h('div',{className:'form-row'},
+      sel('pmarital','Marital Status',[h('option',{value:''},'Select'),h('option',{value:'SINGLE'},'Single'),h('option',{value:'MARRIED'},'Married'),h('option',{value:'DIVORCED'},'Divorced'),h('option',{value:'WIDOWED'},'Widowed')],profile?.maritalStatus),
+      inp('pincome','Annual Income (₹)','number',profile?.annualIncome,{min:'0',max:'100000000',placeholder:'e.g. 200000'})
+    ),
+    h('div',{className:'form-row'},
+      sel('pemploy','Employment Status',[h('option',{value:''},'Select'),h('option',{value:'EMPLOYED'},'Employed'),h('option',{value:'SELF_EMPLOYED'},'Self Employed'),h('option',{value:'UNEMPLOYED'},'Unemployed'),h('option',{value:'STUDENT'},'Student'),h('option',{value:'RETIRED'},'Retired'),h('option',{value:'FARMER'},'Farmer'),h('option',{value:'SELF_EMPLOYED_AGRICULTURE'},'Self Employed (Agriculture)'),h('option',{value:'SELF_EMPLOYED_ARTISAN'},'Self Employed (Artisan)'),h('option',{value:'INFORMAL_WORKER'},'Informal Worker'),h('option',{value:'HOMEMAKER'},'Homemaker')],profile?.employmentStatus),
+      sel('pedu','Education Level',[h('option',{value:''},'Select'),h('option',{value:'NONE'},'No formal education'),h('option',{value:'PRIMARY'},'Primary (1-5)'),h('option',{value:'MIDDLE'},'Middle (6-8)'),h('option',{value:'SECONDARY'},'Secondary (9-10)'),h('option',{value:'HIGHER_SECONDARY'},'Higher Secondary (11-12)'),h('option',{value:'ITI'},'ITI / Diploma'),h('option',{value:'GRADUATE'},'Graduate'),h('option',{value:'POST_GRADUATE'},'Post Graduate'),h('option',{value:'DOCTORATE'},'Doctorate')],profile?.educationLevel)
+    ),
+    h('div',{className:'form-row'},
+      sel('pcategory','Social Category',[h('option',{value:''},'Select'),h('option',{value:'GENERAL'},'General'),h('option',{value:'OBC'},'OBC'),h('option',{value:'SC'},'SC'),h('option',{value:'ST'},'ST'),h('option',{value:'EWS'},'EWS'),h('option',{value:'GENERAL_BPL'},'General (BPL)')],profile?.socialCategory),
+      sel('presidency','Residence Type',[h('option',{value:''},'Select'),h('option',{value:'URBAN'},'Urban'),h('option',{value:'RURAL'},'Rural'),h('option',{value:'SEMI_URBAN'},'Semi-Urban')],profile?.residenceType)
+    ),
+    h('div',{className:'form-group'},h('label',{for:'pdisability'},'Person with Disability'),h('select',{id:'pdisability'},h('option',{value:''},'Select'),h('option',{value:'false',...(profile?.disability===false?{selected:''}:{})},'No'),h('option',{value:'true',...(profile?.disability===true?{selected:''}:{})},'Yes'))),
+    err,
+    h('button',{type:'submit',className:'btn-primary',style:'margin-top:8px'},'Save Profile')
+  );
+  card.appendChild(form);
+}
+
+/* ===== SCHEMES ===== */
+async function renderSchemes(container){
+  container.appendChild(h('div',{className:'page-header'},h('h1',{},'Government Schemes'),h('p',{},'Browse verified Central and State government schemes.')));
+  const stateSelect = h('select',{id:'fstate',on:{change:load}},h('option',{value:''},'All States / Central'),...Object.entries(STATES).map(([k,v])=>h('option',{value:k},v)));
+  const catInput = h('input',{id:'fcat',type:'text',placeholder:'Filter by category...',on:{input:load}});
+  container.appendChild(h('div',{className:'filter-bar'},stateSelect,catInput));
+  const listDiv = h('div',{id:'scheme-list',className:'grid grid-2'});
+  container.appendChild(listDiv);
+  async function load(){
+    listDiv.innerHTML=''; listDiv.appendChild(h('div',{className:'loading-full'},h('div',{className:'spinner'}),h('span',{},'Loading schemes...')));
+    try{
+      let url='/api/v1/schemes';
+      const params=[];
+      if(stateSelect.value) params.push('state='+stateSelect.value);
+      if(catInput.value.trim()) params.push('category='+encodeURIComponent(catInput.value.trim()));
+      if(params.length) url+='?'+params.join('&');
+      const schemes=await api(url);
+      listDiv.innerHTML='';
+      if(!schemes.length){ listDiv.appendChild(h('div',{className:'empty-state'},h('h3',{},'No schemes found'),h('p',{},'Try adjusting your filters or check back later.'))); return; }
+      schemes.forEach(s=>{
+        const verified = s.verifiedAt?h('span',{className:'badge badge-green'},'✓ Verified'):h('span',{className:'badge badge-yellow'},'Unverified');
+        const scope = s.scope==='CENTRAL'?h('span',{className:'badge badge-blue'},'Central'):h('span',{className:'badge badge-saffron'},STATES[s.stateCode]||s.stateCode);
+        const card = h('div',{className:'card scheme-list-item',on:{click:()=>route('scheme/'+s.id)}},
+          h('div',{style:'display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap'},scope,h('span',{className:'tag'},s.category),verified),
+          h('h3',{style:'font-weight:700;font-size:1rem;margin-bottom:6px'},s.title),
+          h('p',{style:'font-size:.85rem;color:var(--text2);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden'},s.summary)
+        );
+        listDiv.appendChild(card);
+      });
+    }catch(e){ listDiv.innerHTML=''; listDiv.appendChild(h('div',{className:'alert alert-error'},e.message)); }
+  }
+  load();
+}
+
+/* ===== SCHEME DETAIL ===== */
+async function renderSchemeDetail(container, id){
+  const loadDiv = h('div',{className:'loading-full'},h('div',{className:'spinner'}),h('span',{},'Loading scheme details...'));
+  container.appendChild(loadDiv);
+  try{
+    const s = await api('/api/v1/schemes/'+id);
+    loadDiv.remove();
+    container.appendChild(h('div',{style:'margin-bottom:16px'},h('a',{href:'#schemes',style:'color:var(--navy);font-size:.85rem'},'← Back to Schemes')));
+    const scope = s.scope==='CENTRAL'?'Central Government':(STATES[s.stateCode]||s.stateCode)+' State';
+    const verified = s.verifiedAt ? 'Verified on '+new Date(s.verifiedAt).toLocaleDateString('en-IN') : 'Not yet verified';
+    const header = h('div',{className:'card'},
+      h('div',{style:'display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap'},
+        h('span',{className:s.scope==='CENTRAL'?'badge badge-blue':'badge badge-saffron'},scope),
+        h('span',{className:'tag'},s.category),
+        h('span',{className:s.verifiedAt?'badge badge-green':'badge badge-yellow'},verified)
+      ),
+      h('h1',{style:'font-size:1.5rem;font-weight:800;margin-bottom:12px'},s.title),
+      h('p',{style:'color:var(--text2);margin-bottom:16px'},s.summary),
+      s.benefitDescription?h('div',{style:'margin-bottom:16px'},h('h3',{style:'font-weight:700;font-size:.95rem;margin-bottom:6px'},'Benefits'),h('p',{style:'font-size:.9rem'},s.benefitDescription)):null,
+      h('div',{style:'display:flex;gap:12px;flex-wrap:wrap;margin-top:16px'},
+        s.applicationUrl?h('a',{href:s.applicationUrl,target:'_blank',className:'btn-saffron',style:'display:inline-block;text-decoration:none;padding:10px 20px;border-radius:6px'},'Apply Online ↗'):null,
+        h('a',{href:s.sourceUrl,target:'_blank',className:'btn-outline',style:'display:inline-block;text-decoration:none;padding:10px 20px;border-radius:6px'},'Official Source ↗'),
+        auth?h('button',{className:'btn-green',on:{click:()=>checkEligibility(container,s)}},'Check My Eligibility'):null,
+        auth?h('button',{className:'btn-primary',on:{click:()=>trackScheme(s.id)}},'Add to Tracker'):null
+      )
+    );
+    container.appendChild(header);
+
+    // Required documents
+    if(s.requiredDocuments && s.requiredDocuments.length){
+      const docsCard = h('div',{className:'card'},h('h3',{style:'font-weight:700;margin-bottom:12px'},'Required Documents'));
+      const docList = h('div',{});
+      s.requiredDocuments.forEach(d=>{
+        docList.appendChild(h('div',{style:'padding:6px 0;font-size:.9rem;display:flex;align-items:center;gap:8px'},h('span',{},'📄'),h('span',{},typeof d==='string'?d:d.toString())));
+      });
+      docsCard.appendChild(docList);
+      container.appendChild(docsCard);
+    }
+    // Source info
+    container.appendChild(h('div',{className:'card',style:'font-size:.85rem;color:var(--text2)'},
+      h('strong',{},'Source: '),h('span',{},s.sourceName||''),h('br'),
+      h('strong',{},'URL: '),h('a',{href:s.sourceUrl,target:'_blank'},s.sourceUrl)
+    ));
+  }catch(e){ loadDiv.remove(); container.appendChild(h('div',{className:'alert alert-error'},e.message)); }
+}
+
+async function checkEligibility(container, scheme){
+  const existing = $('#eligibility-result'); if(existing) existing.remove();
+  const resultDiv = h('div',{id:'eligibility-result',className:'card eligibility-result',style:'margin-top:16px'});
+  container.appendChild(resultDiv);
+  resultDiv.appendChild(h('div',{className:'loading-full'},h('div',{className:'spinner'}),h('span',{},'Checking eligibility...')));
+  try{
+    const r = await api('/api/v1/eligibility/'+scheme.id);
+    resultDiv.innerHTML='';
+    const statusMap = {ELIGIBLE:{cls:'badge-green',text:'✓ Eligible'},NOT_ELIGIBLE:{cls:'badge-red',text:'✗ Not Eligible'},NEEDS_INFORMATION:{cls:'badge-yellow',text:'⚠ Needs More Information'}};
+    const st = statusMap[r.status]||{cls:'badge-gray',text:r.status};
+    resultDiv.appendChild(h('div',{className:'card-header'},h('h2',{},'Eligibility Assessment'),h('span',{className:'badge '+st.cls,style:'font-size:.9rem;padding:6px 14px'},st.text)));
+    if(r.matched?.length){ resultDiv.appendChild(h('h4',{style:'font-size:.85rem;font-weight:600;margin:12px 0 6px;color:var(--green)'},'✓ Conditions Met'));r.matched.forEach(m=>resultDiv.appendChild(h('div',{className:'rule rule-pass'},'✓ ',m))); }
+    if(r.unmet?.length){ resultDiv.appendChild(h('h4',{style:'font-size:.85rem;font-weight:600;margin:12px 0 6px;color:var(--danger)'},'✗ Conditions Not Met'));r.unmet.forEach(m=>resultDiv.appendChild(h('div',{className:'rule rule-fail'},'✗ ',m))); }
+    if(r.missingInformation?.length){ resultDiv.appendChild(h('h4',{style:'font-size:.85rem;font-weight:600;margin:12px 0 6px;color:#856404'},'⚠ Missing Information'));r.missingInformation.forEach(m=>resultDiv.appendChild(h('div',{className:'rule rule-missing'},'⚠ ',m))); }
+    if(r.notice) resultDiv.appendChild(h('div',{className:'alert alert-info',style:'margin-top:16px'},r.notice));
+  }catch(e){ resultDiv.innerHTML=''; resultDiv.appendChild(h('div',{className:'alert alert-error'},e.message)); }
+}
+
+async function trackScheme(schemeId){
+  try{
+    await api('/api/v1/my-applications',{method:'POST',body:{schemeId,notes:''}});
+    alert('Scheme added to your tracker!');
+  }catch(e){ alert(e.message); }
+}
+
+/* ===== DOCUMENTS ===== */
+async function renderDocuments(container){
+  container.appendChild(h('div',{className:'page-header'},h('h1',{},'Document Checklist'),h('p',{},'Track which documents you have ready for scheme applications.')));
+  const loadDiv = h('div',{className:'loading-full'},h('div',{className:'spinner'}),h('span',{},'Loading...'));
+  container.appendChild(loadDiv);
+  try{
+    const [catalog, checklist] = await Promise.all([api('/api/v1/documents/catalog'), api('/api/v1/documents/my-checklist')]);
+    loadDiv.remove();
+    const checkMap = {};
+    checklist.forEach(c=>checkMap[c.documentId]=c);
+
+    // My Checklist
+    if(checklist.length){
+      const myCard = h('div',{className:'card'},h('h2',{style:'margin-bottom:16px;font-size:1.1rem'},'My Document Status'));
+      checklist.forEach(c=>{
+        const statusCls = c.status==='READY'?'badge-green':c.status==='EXPIRED'?'badge-red':c.status==='NOT_APPLICABLE'?'badge-gray':'badge-yellow';
+        const item = h('div',{className:'checklist-item'},
+          h('div',{},h('strong',{style:'font-size:.9rem'},c.title),c.notes?h('p',{style:'font-size:.8rem;color:var(--text2);margin-top:2px'},c.notes):null),
+          h('div',{style:'display:flex;gap:8px;align-items:center'},
+            h('span',{className:'badge '+statusCls},c.status),
+            h('button',{className:'btn-danger btn-sm',on:{click:async()=>{try{await api('/api/v1/documents/my-checklist/'+c.id,{method:'DELETE'});renderDocuments(container.parentElement?container:$('.container'));}catch(e){alert(e.message);}}}},'Remove')
+          )
+        );
+        myCard.appendChild(item);
+      });
+      container.appendChild(myCard);
+    }
+
+    // Catalog
+    const catCard = h('div',{className:'card'},h('h2',{style:'margin-bottom:16px;font-size:1.1rem'},'Document Catalog — Add to Your Checklist'));
+    const grouped = {};
+    catalog.forEach(d=>{(grouped[d.category]=grouped[d.category]||[]).push(d);});
+    Object.entries(grouped).sort().forEach(([cat,docs])=>{
+      catCard.appendChild(h('h3',{style:'font-weight:600;font-size:.9rem;margin:16px 0 8px;color:var(--navy)'},cat.replace(/_/g,' ')));
+      docs.forEach(d=>{
+        const existing = checkMap[d.id];
+        const statusSel = h('select',{style:'max-width:150px'},
+          h('option',{value:'NEEDED',...(!existing||existing.status==='NEEDED'?{selected:''}:{})},'Needed'),
+          h('option',{value:'READY',...(existing?.status==='READY'?{selected:''}:{})},'Ready'),
+          h('option',{value:'EXPIRED',...(existing?.status==='EXPIRED'?{selected:''}:{})},'Expired'),
+          h('option',{value:'NOT_APPLICABLE',...(existing?.status==='NOT_APPLICABLE'?{selected:''}:{})},'Not Applicable')
+        );
+        const addBtn = h('button',{className:'btn-primary btn-sm',on:{click:async()=>{
+          try{
+            await api('/api/v1/documents/my-checklist',{method:'PUT',body:{documentId:d.id,status:statusSel.value,notes:''}});
+            // Refresh
+            container.innerHTML=''; renderDocuments(container);
+          }catch(e){alert(e.message);}
+        }}},existing?'Update':'Add');
+        catCard.appendChild(h('div',{className:'checklist-item'},
+          h('div',{},h('strong',{style:'font-size:.9rem'},d.title),h('p',{style:'font-size:.8rem;color:var(--text2);margin-top:2px'},d.description)),
+          h('div',{style:'display:flex;gap:8px;align-items:center'},statusSel,addBtn)
+        ));
+      });
+    });
+    container.appendChild(catCard);
+  }catch(e){ loadDiv.remove(); container.appendChild(h('div',{className:'alert alert-error'},e.message)); }
+}
+
+/* ===== TRACKER ===== */
+async function renderTracker(container){
+  container.appendChild(h('div',{className:'page-header'},h('h1',{},'Application Tracker'),h('p',{},'Track the progress of your scheme applications.')));
+  const loadDiv = h('div',{className:'loading-full'},h('div',{className:'spinner'}),h('span',{},'Loading...'));
+  container.appendChild(loadDiv);
+  try{
+    const apps = await api('/api/v1/my-applications');
+    loadDiv.remove();
+    if(!apps.length){ container.appendChild(h('div',{className:'empty-state'},h('h3',{},'No applications tracked yet'),h('p',{},'Browse schemes and add them to your tracker to get started.'),h('a',{href:'#schemes',className:'btn-primary',style:'display:inline-block;margin-top:12px;text-decoration:none'},'Browse Schemes'))); return; }
+    const statusColors = {INTERESTED:'badge-blue',PREPARING:'badge-yellow',SUBMITTED:'badge-saffron',UNDER_REVIEW:'badge-yellow',APPROVED:'badge-green',REJECTED:'badge-red',ON_HOLD:'badge-gray'};
+    // Load scheme titles
+    let schemeMap={};
+    try{ const schemes=await api('/api/v1/schemes'); schemes.forEach(s=>schemeMap[s.id]=s.title); }catch(e){}
+
+    apps.forEach(a=>{
+      const card = h('div',{className:'card'});
+      const title = schemeMap[a.schemeId]||'Scheme '+a.schemeId.substring(0,8);
+      card.appendChild(h('div',{style:'display:flex;justify-content:space-between;align-items:center;margin-bottom:12px'},
+        h('h3',{style:'font-weight:700;font-size:1rem'},title),
+        h('span',{className:'badge '+(statusColors[a.status]||'badge-gray')},a.status)
+      ));
+      if(a.notes) card.appendChild(h('p',{style:'font-size:.85rem;color:var(--text2);margin-bottom:12px'},a.notes));
+      if(a.appliedOn) card.appendChild(h('p',{style:'font-size:.8rem;color:var(--text2)'},'Applied: '+new Date(a.appliedOn).toLocaleDateString('en-IN')));
+      // Update form
+      const statusSel = h('select',{style:'max-width:180px'},
+        ...['INTERESTED','PREPARING','SUBMITTED','UNDER_REVIEW','APPROVED','REJECTED','ON_HOLD'].map(s=>h('option',{value:s,...(a.status===s?{selected:''}:{})},s))
+      );
+      const notesInput = h('input',{type:'text',placeholder:'Notes...',value:a.notes||'',style:'max-width:300px'});
+      const dateInput = h('input',{type:'date',value:a.appliedOn||'',style:'max-width:160px'});
+      card.appendChild(h('div',{style:'display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;align-items:center'},
+        statusSel,notesInput,dateInput,
+        h('button',{className:'btn-primary btn-sm',on:{click:async()=>{
+          try{
+            await api('/api/v1/my-applications/'+a.id,{method:'PUT',body:{status:statusSel.value,notes:notesInput.value,appliedOn:dateInput.value||null}});
+            container.innerHTML=''; renderTracker(container);
+          }catch(e){alert(e.message);}
+        }}},'Update'),
+        h('button',{className:'btn-danger btn-sm',on:{click:async()=>{
+          if(!confirm('Remove this from your tracker?')) return;
+          try{ await api('/api/v1/my-applications/'+a.id,{method:'DELETE'}); container.innerHTML=''; renderTracker(container); }catch(e){alert(e.message);}
+        }}},'Remove')
+      ));
+      container.appendChild(card);
+    });
+  }catch(e){ loadDiv.remove(); container.appendChild(h('div',{className:'alert alert-error'},e.message)); }
+}
+
+/* ===== ADMIN ===== */
+async function renderAdmin(container){
+  if(!isAdmin()){ container.appendChild(h('div',{className:'alert alert-error'},'Access denied. Admin or Reviewer role required.')); return; }
+  container.appendChild(h('div',{className:'page-header'},h('h1',{},'Admin — Scheme Review'),h('p',{},'Review and approve scheme entries for publication.')));
+  const loadDiv = h('div',{className:'loading-full'},h('div',{className:'spinner'}),h('span',{},'Loading review queue...'));
+  container.appendChild(loadDiv);
+  try{
+    const queue = await api('/api/v1/admin/scheme-reviews/queue');
+    loadDiv.remove();
+    if(!queue.length){ container.appendChild(h('div',{className:'empty-state'},h('h3',{},'Review queue is empty'),h('p',{},'All schemes have been reviewed. Check back later.'))); return; }
+    queue.forEach(s=>{
+      const card = h('div',{className:'card'});
+      card.appendChild(h('div',{style:'display:flex;gap:6px;margin-bottom:8px'},h('span',{className:s.scope==='CENTRAL'?'badge badge-blue':'badge badge-saffron'},s.scope),h('span',{className:'tag'},s.category)));
+      card.appendChild(h('h3',{style:'font-weight:700;margin-bottom:8px'},s.title));
+      card.appendChild(h('p',{style:'font-size:.85rem;color:var(--text2);margin-bottom:12px'},s.summary));
+      card.appendChild(h('p',{style:'font-size:.8rem;margin-bottom:12px'},h('strong',{},'Source: '),h('a',{href:s.sourceUrl,target:'_blank'},s.sourceUrl)));
+      const commentInput = h('textarea',{placeholder:'Review comment (optional)...',rows:'2',style:'margin-bottom:8px'});
+      const msgDiv = h('div',{});
+      card.appendChild(commentInput);
+      card.appendChild(h('div',{style:'display:flex;gap:8px'},
+        h('button',{className:'btn-green',on:{click:async()=>{
+          try{ await api('/api/v1/admin/scheme-reviews/'+s.id+'/approve',{method:'POST',body:{comment:commentInput.value}}); msgDiv.innerHTML=''; msgDiv.appendChild(h('div',{className:'alert alert-success'},'Approved and published!')); setTimeout(()=>{container.innerHTML='';renderAdmin(container);},1000); }
+          catch(e){ msgDiv.innerHTML=''; msgDiv.appendChild(h('div',{className:'alert alert-error'},e.message)); }
+        }}},'✓ Approve & Publish'),
+        h('button',{className:'btn-danger',on:{click:async()=>{
+          try{ await api('/api/v1/admin/scheme-reviews/'+s.id+'/reject',{method:'POST',body:{comment:commentInput.value}}); msgDiv.innerHTML=''; msgDiv.appendChild(h('div',{className:'alert alert-success'},'Rejected.')); setTimeout(()=>{container.innerHTML='';renderAdmin(container);},1000); }
+          catch(e){ msgDiv.innerHTML=''; msgDiv.appendChild(h('div',{className:'alert alert-error'},e.message)); }
+        }}},'✗ Reject')
+      ));
+      card.appendChild(msgDiv);
+      container.appendChild(card);
+    });
+  }catch(e){ loadDiv.remove(); container.appendChild(h('div',{className:'alert alert-error'},e.message)); }
+}
+</script>
+</body>
+</html>

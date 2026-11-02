@@ -1,0 +1,3 @@
+package in.schemesathi.profile;
+import jakarta.validation.Valid; import org.springframework.security.core.Authentication; import org.springframework.web.bind.annotation.*; import java.util.UUID;
+@RestController @RequestMapping("/api/v1/profile") public class ProfileController{private final ProfileService service;public ProfileController(ProfileService service){this.service=service;}private UUID user(Authentication a){return UUID.fromString(a.getName());}@GetMapping public ProfileDtos.ProfileResponse get(Authentication a){return service.get(user(a));}@PutMapping public ProfileDtos.ProfileResponse save(Authentication a,@Valid @RequestBody ProfileDtos.UpsertRequest r){return service.save(user(a),r);}}
