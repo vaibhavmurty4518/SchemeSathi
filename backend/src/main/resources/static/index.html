@@ -90,7 +90,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:.85rem}
 
 <script>
 'use strict';
-const API = location.origin;
+const API = (window.API_BASE || localStorage.getItem('ss_api_base') || (location.port === '8080' ? location.origin : (location.hostname === 'localhost' || location.hostname === '127.0.0.1' ? 'http://localhost:8080' : location.origin))).replace(/\/$/, '');
 const STATES = {AP:'Andhra Pradesh',AR:'Arunachal Pradesh',AS:'Assam',BR:'Bihar',CG:'Chhattisgarh',GA:'Goa',GJ:'Gujarat',HR:'Haryana',HP:'Himachal Pradesh',JH:'Jharkhand',KA:'Karnataka',KL:'Kerala',MP:'Madhya Pradesh',MH:'Maharashtra',MN:'Manipur',ML:'Meghalaya',MZ:'Mizoram',NL:'Nagaland',OD:'Odisha',PB:'Punjab',RJ:'Rajasthan',SK:'Sikkim',TN:'Tamil Nadu',TS:'Telangana',TR:'Tripura',UP:'Uttar Pradesh',UK:'Uttarakhand',WB:'West Bengal',AN:'Andaman & Nicobar',CH:'Chandigarh',DN:'Dadra & Nagar Haveli',DD:'Daman & Diu',DL:'Delhi',JK:'Jammu & Kashmir',LA:'Ladakh',LD:'Lakshadweep',PY:'Puducherry'};
 
 let auth = null;
